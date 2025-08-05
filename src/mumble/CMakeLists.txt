@@ -689,6 +689,7 @@ else()
 			PRIVATE
 				"AppNap.h"
 				"AppNap.mm"
+				"ThemeSwitch_macx.mm"
 				"GlobalShortcut_macx.h"
 				"GlobalShortcut_macx.mm"
 				"os_macx.mm"
