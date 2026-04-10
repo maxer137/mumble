@@ -913,23 +913,26 @@ if(plugins)
 endif()
 
 if(screen-sharing)
+
+	# Shared sources (all platforms)
+	target_sources(mumble_client_lib PRIVATE
+						"CaptureSource.h"
+						"CaptureSourceLister.h"
+						"ScreenPickerDialog.h"
+						"ScreenPickerDialog.cpp"
+						"ScreenShareReceiver.h"
+						"ScreenShareReceiver.cpp"
+				)
+
 	if(WIN32)
 		if(NOT FFMPEG_DIR)
 			set(FFMPEG_DIR "${3RDPARTY_DIR}/ffmpeg")
 		endif()
 
-		target_sources(mumble_client_lib
-			PRIVATE
-				"ScreenCapture.h"
-				"ScreenCapture.cpp"
-				"ScreenShareReceiver.h"
-				"ScreenShareReceiver.cpp"
-		)
-
 		target_compile_definitions(mumble_client_lib PUBLIC "USE_SCREEN_SHARING")
 		target_include_directories(mumble_client_lib
-			SYSTEM PUBLIC
-				"${FFMPEG_DIR}/include"
+				SYSTEM PUBLIC
+					"${FFMPEG_DIR}/include"
 		)
 	else()
 		find_package(PkgConfig REQUIRED)
@@ -938,16 +941,54 @@ if(screen-sharing)
 		pkg_check_modules(LIBAVUTIL  REQUIRED libavutil)
 
 		target_include_directories(mumble_client_lib SYSTEM PUBLIC
-			${LIBAVCODEC_INCLUDE_DIRS}
-			${LIBSWSCALE_INCLUDE_DIRS}
-			${LIBAVUTIL_INCLUDE_DIRS}
-		)
+												${LIBAVCODEC_INCLUDE_DIRS}
+												${LIBSWSCALE_INCLUDE_DIRS}
+												${LIBAVUTIL_INCLUDE_DIRS}
+								)
+
 		target_link_libraries(mumble_client_lib PUBLIC
-			${LIBAVCODEC_LIBRARIES}
-			${LIBSWSCALE_LIBRARIES}
-			${LIBAVUTIL_LIBRARIES}
-		)
+												${LIBAVCODEC_LIBRARIES}
+												${LIBSWSCALE_LIBRARIES}
+												${LIBAVUTIL_LIBRARIES}
+								)
+
 		target_compile_definitions(mumble_client_lib PUBLIC "USE_SCREEN_SHARING")
+		if(APPLE)
+			target_sources(mumble_client_lib PRIVATE
+																"CaptureSourceLister_macx.mm"
+																"SCKitCapture.h"
+																"SCKitCapture_macx.mm"
+			)
+
+			find_library(LIB_COREGRAPHICS CoreGraphics)
+			if(LIB_COREGRAPHICS)
+				target_link_libraries(mumble_client_lib PUBLIC ${LIB_COREGRAPHICS})
+			endif()
+
+			find_library(LIB_SCREENCAPTUREKIT ScreenCaptureKit)
+			if(LIB_SCREENCAPTUREKIT)
+				target_link_libraries(mumble_client_lib PUBLIC ${LIB_SCREENCAPTUREKIT})
+			endif()
+
+			find_library(LIB_COREMEDIA CoreMedia)
+			if(LIB_COREMEDIA)
+				target_link_libraries(mumble_client_lib PUBLIC ${LIB_COREMEDIA})
+			endif()
+
+			find_library(LIB_COREVIDEO CoreVideo)
+			if(LIB_COREVIDEO)
+				target_link_libraries(mumble_client_lib PUBLIC ${LIB_COREVIDEO})
+			endif()
+
+		else()
+			target_sources(mumble_client_lib PRIVATE
+																"CaptureSourceLister_unix.cpp"
+			)
+			if(TARGET X11::X11)
+				target_link_libraries(mumble_client_lib PUBLIC X11::X11)
+				target_compile_definitions(mumble_client_lib PRIVATE "HAS_X11_WINDOW_LIST")
+			endif()
+		endif()
 	endif()
 endif()
 

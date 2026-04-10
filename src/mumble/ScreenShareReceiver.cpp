@@ -438,7 +438,7 @@ void ScreenShareReceiver::decodeCompleteFrame(quint32 session, SenderState &send
 		if (!ds.swsCtx || ds.swsWidth != dw || ds.swsHeight != dh) {
 			if (ds.swsCtx)
 				sws_freeContext(ds.swsCtx);
-			ds.swsCtx = sws_getContext(dw, dh, static_cast< AVPixelFormat >(ds.frame->format), dw, dh, AV_PIX_FMT_RGB24,
+			ds.swsCtx = sws_getContext(dw, dh, static_cast< AVPixelFormat >(ds.frame->format), dw, dh, AV_PIX_FMT_RGBA,
 									   SWS_BILINEAR, nullptr, nullptr, nullptr);
 			ds.swsWidth  = dw;
 			ds.swsHeight = dh;
@@ -446,7 +446,7 @@ void ScreenShareReceiver::decodeCompleteFrame(quint32 session, SenderState &send
 		if (!ds.swsCtx)
 			continue;
 
-		QImage img(dw, dh, QImage::Format_RGB888);
+		QImage img(dw, dh, QImage::Format_RGBA8888);
 		uint8_t *dstData[1] = { img.bits() };
 		int dstStride[1]    = { static_cast< int >(img.bytesPerLine()) };
 		sws_scale(ds.swsCtx, ds.frame->data, ds.frame->linesize, 0, dh, dstData, dstStride);

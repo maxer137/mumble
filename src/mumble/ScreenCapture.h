@@ -13,6 +13,7 @@
 #include <cstdint>
 
 #ifdef USE_SCREEN_SHARING
+#	include "CaptureSource.h"
 extern "C" {
 #	include <libavcodec/avcodec.h>
 #	include <libavutil/opt.h>
@@ -35,11 +36,13 @@ struct EncodedVideoFrame {
 	bool isKeyFrame = false;
 };
 
-/// Captures the primary display at ~15 fps and emits encoded video frames via frameEncoded().
+/// Captures a selected screen or window at ~15 fps and emits encoded video frames via frameEncoded().
+///
+/// On macOS 14+, startCaptureNative() shows the OS-native SCContentSharingPicker and streams
+/// frames via SCStream; captureStarted() / captureAborted() signals report the async outcome.
+/// On other platforms (or macOS < 14), use setSource() + startCapture() with ScreenPickerDialog.
 ///
 /// Requires the build option -Dscreen-sharing=ON (links libavcodec/libswscale).
-/// Without that option the class is still present but startCapture() logs a warning and
-/// returns immediately without capturing anything.
 class ScreenCapture : public QObject {
 private:
 	Q_OBJECT
@@ -58,9 +61,28 @@ public:
 	/// limits how many key frames are sent no matter how many viewers ask for them.
 	void requestKeyFrame();
 
+#ifdef USE_SCREEN_SHARING
+	/// Sets the capture source for the non-native picker path. Call before startCapture().
+	void setSource(const CaptureSource &source);
+
+#	ifdef Q_OS_MAC
+	/// Shows the native macOS SCContentSharingPicker (macOS 14+) and starts capturing
+	/// the selected source via SCStream. Asynchronous: returns immediately.
+	/// captureStarted() is emitted when the stream is running; captureAborted() if cancelled/failed.
+	void startCaptureNative();
+#	endif
+#endif
+
 signals:
 	/// Emitted for every successfully encoded frame.
 	void frameEncoded(const EncodedVideoFrame &frame);
+
+#if defined(USE_SCREEN_SHARING) && defined(Q_OS_MAC)
+	/// Emitted on the main thread when the native SCStream starts delivering frames.
+	void captureStarted();
+	/// Emitted on the main thread when the native picker is cancelled or the stream fails.
+	void captureAborted();
+#endif
 
 private slots:
 	void captureFrame();
@@ -69,6 +91,11 @@ private:
 #ifdef USE_SCREEN_SHARING
 	bool initEncoder(int width, int height);
 	void destroyEncoder();
+	/// Shared encode path used by both capture modes.
+	/// @param captureTime  Capture time in microseconds on m_streamClock.
+	void encodeImage(const QImage &srcImage, qint64 captureTime);
+
+	CaptureSource m_source; ///< Defaults to EntireScreen, screenIndex=0 (primary display).
 
 	AVCodecContext *m_codecCtx = nullptr;
 	AVFrame *m_frame           = nullptr;
