@@ -4,32 +4,32 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_library(mumble_server_database STATIC
-	"ServerDatabase.cpp"
-	"DBChannel.cpp"
-	"DBUser.cpp"
-	"DBUserData.cpp"
-	"DBGroup.cpp"
-	"DBGroupMember.cpp"
-	"DBAcl.cpp"
-	"DBChannelLink.cpp"
-	"DBBan.cpp"
-	"DBChannelListener.cpp"
-	"ACLCompat.cpp"
+ "ServerDatabase.cpp"
+ "DBChannel.cpp"
+ "DBUser.cpp"
+ "DBUserData.cpp"
+ "DBGroup.cpp"
+ "DBGroupMember.cpp"
+ "DBAcl.cpp"
+ "DBChannelLink.cpp"
+ "DBBan.cpp"
+ "DBChannelListener.cpp"
+ "ACLCompat.cpp"
 
-	# Table implementations
-	"ServerTable.cpp"
-	"LogTable.cpp"
-	"ConfigTable.cpp"
-	"ChannelTable.cpp"
-	"ChannelPropertyTable.cpp"
-	"UserTable.cpp"
-	"UserPropertyTable.cpp"
-	"GroupTable.cpp"
-	"GroupMemberTable.cpp"
-	"ACLTable.cpp"
-	"ChannelLinkTable.cpp"
-	"BanTable.cpp"
-	"ChannelListenerTable.cpp"
+  # Table implementations
+ "ServerTable.cpp"
+ "LogTable.cpp"
+ "ConfigTable.cpp"
+ "ChannelTable.cpp"
+ "ChannelPropertyTable.cpp"
+ "UserTable.cpp"
+ "UserPropertyTable.cpp"
+ "GroupTable.cpp"
+ "GroupMemberTable.cpp"
+ "ACLTable.cpp"
+ "ChannelLinkTable.cpp"
+ "BanTable.cpp"
+ "ChannelListenerTable.cpp"
 )
 
 set_property(TARGET mumble_server_database PROPERTY INTERPROCEDURAL_OPTIMIZATION ${lto})
@@ -40,6 +40,6 @@ find_pkg(Boost 1.62.0 REQUIRED)
 target_link_libraries(mumble_server_database PUBLIC mumble_database Boost::headers)
 
 target_include_directories(mumble_server_database
-	PUBLIC
-		"${SHARED_SOURCE_DIR}"
+ PUBLIC
+  "${SHARED_SOURCE_DIR}"
 )

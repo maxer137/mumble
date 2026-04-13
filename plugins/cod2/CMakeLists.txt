@@ -4,15 +4,15 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_library(cod2 SHARED
-	"cod2.cpp"
+ "cod2.cpp"
 
-	"../Module.cpp"
-	"../ProcessBase.cpp"
-	"../ProcessWindows.cpp"
+ "../Module.cpp"
+ "../ProcessBase.cpp"
+ "../ProcessWindows.cpp"
 )
 
 if(WIN32)
-	target_sources(cod2 PRIVATE "../HostWindows.cpp")
+  target_sources(cod2 PRIVATE "../HostWindows.cpp")
 else()
-	target_sources(cod2 PRIVATE "../HostLinux.cpp")
+  target_sources(cod2 PRIVATE "../HostLinux.cpp")
 endif()

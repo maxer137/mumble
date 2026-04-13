@@ -6,10 +6,10 @@
 set(MUMBLE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/mumble")
 
 set(TESTXMLTOOLS_SOURCES
-	TestXMLTools.cpp
+ TestXMLTools.cpp
 
-	"${MUMBLE_SOURCE_DIR}/XMLTools.cpp"
-	"${MUMBLE_SOURCE_DIR}/XMLTools.h"
+ "${MUMBLE_SOURCE_DIR}/XMLTools.cpp"
+ "${MUMBLE_SOURCE_DIR}/XMLTools.h"
 )
 
 add_executable(TestXMLTools ${TESTXMLTOOLS_SOURCES})

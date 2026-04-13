@@ -5,7 +5,7 @@
 
 set(PLUGIN_RETRACTED ON PARENT_SCOPE)
 if(retracted-plugins)
-	add_library(dods SHARED "../null_plugin.cpp")
+  add_library(dods SHARED "../null_plugin.cpp")
 
-	target_compile_definitions(dods PRIVATE "NULL_DESC=L\"Day of Defeat: Source (retracted, now using Link)\"")
+  target_compile_definitions(dods PRIVATE "NULL_DESC=L\"Day of Defeat: Source (retracted, now using Link)\"")
 endif()

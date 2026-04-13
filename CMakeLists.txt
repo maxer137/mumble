@@ -10,31 +10,31 @@ set(BUILD_NUMBER CACHE STRING "The build number of the current build. Will be us
 set(BUILD_RELEASE_DATE CACHE STRING "The release date to be used in the generated appstream metadata.")
 
 if ("${BUILD_NUMBER}" STREQUAL "")
-	if(packaging)
-		message(FATAL_ERROR "Tried to create a Mumble package, without specifying BUILD_NUMBER!")
-	else()
-		set(BUILD_NUMBER "0")
-	endif()
+  if(packaging)
+    message(FATAL_ERROR "Tried to create a Mumble package, without specifying BUILD_NUMBER!")
+  else()
+    set(BUILD_NUMBER "0")
+  endif()
 endif()
 
 project(mumble
-	VERSION "1.7.${BUILD_NUMBER}"
-	DESCRIPTION "Open source, low-latency, high quality voice chat."
-	HOMEPAGE_URL "https://www.mumble.info"
-	LANGUAGES "C" "CXX"
+ VERSION "1.7.${BUILD_NUMBER}"
+ DESCRIPTION "Open source, low-latency, high quality voice chat."
+ HOMEPAGE_URL "https://www.mumble.info"
+ LANGUAGES "C" "CXX"
 )
 
 set(3RDPARTY_DIR "${CMAKE_SOURCE_DIR}/3rdparty")
 set(PLUGINS_DIR "${CMAKE_SOURCE_DIR}/plugins")
 
 list(APPEND CMAKE_MODULE_PATH
-	"${CMAKE_SOURCE_DIR}/cmake"
-	"${CMAKE_SOURCE_DIR}/cmake/FindModules"
-	"${3RDPARTY_DIR}/cmake-compiler-flags"
+ "${CMAKE_SOURCE_DIR}/cmake"
+ "${CMAKE_SOURCE_DIR}/cmake/FindModules"
+ "${3RDPARTY_DIR}/cmake-compiler-flags"
 )
 
 if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 20)
-	set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 20)
 endif()
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
@@ -65,24 +65,24 @@ option(tests "Build tests." ${packaging})
 option(plugins "Build plugins." ON)
 
 if (WIN32)
-	option(skip-msi-rebuild "Prevent rebuilding installer MSI files from source. Used to be able to include signed MSI files in the bundle." OFF)
+  option(skip-msi-rebuild "Prevent rebuilding installer MSI files from source. Used to be able to include signed MSI files in the bundle." OFF)
 endif()
 
 option(debug-dependency-search "Prints extended information during the search for the needed dependencies" OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(
+  add_definitions(
         "-DDEBUG"
         "-DSNAPSHOT_BUILD"
     )
 endif()
 
 if (NOT DEFINED CMAKE_CXX_SCAN_FOR_MODULES)
-	# For now, we don't use C++ modules, so we can save ourselves the overhead
-	# of scanning every source file (and excluding them from unity buils)
-	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+  # For now, we don't use C++ modules, so we can save ourselves the overhead
+  # of scanning every source file (and excluding them from unity buils)
+  set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 endif()
 
 option(lto "Enables link-time optimizations for release builds" ${LTO_DEFAULT})
@@ -100,23 +100,23 @@ string(TOLOWER "${MUMBLE_TARGET_ARCH}" MUMBLE_TARGET_ARCH)
 # compile definitions breaks quoting for some generators (notably Unix Makefiles).
 # For those cases, expose a stable, single-string arch identifier.
 if(APPLE AND MUMBLE_TARGET_ARCH MATCHES ";")
-	set(MUMBLE_TARGET_ARCH "universal")
+  set(MUMBLE_TARGET_ARCH "universal")
 endif()
 
 if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
-	option(overlay "Build overlay." ${client})
-	if(64_BIT AND NOT MUMBLE_TARGET_ARCH STREQUAL "arm64")
-		option(overlay-xcompile "Build 32 bit overlay library, necessary for the overlay to work with 32 bit processes." ${client})
-	endif()
+  option(overlay "Build overlay." ${client})
+  if(64_BIT AND NOT MUMBLE_TARGET_ARCH STREQUAL "arm64")
+    option(overlay-xcompile "Build 32 bit overlay library, necessary for the overlay to work with 32 bit processes." ${client})
+  endif()
 endif()
 
 message(STATUS "##################################################")
 message(STATUS "Mumble version:              ${PROJECT_VERSION}")
 message(STATUS "Architecture:                ${MUMBLE_TARGET_ARCH}")
 if(NOT IS_MULTI_CONFIG)
-    message(STATUS "Build type:                  ${CMAKE_BUILD_TYPE}")
+  message(STATUS "Build type:                  ${CMAKE_BUILD_TYPE}")
 else()
-    message(STATUS "Using multi-config generator that will determine build type on-the-fly")
+  message(STATUS "Using multi-config generator that will determine build type on-the-fly")
 endif()
 message(STATUS "Using LTO in release builds: ${lto}")
 message(STATUS "##################################################")
@@ -125,35 +125,35 @@ include(install-paths)
 
 # We have to check for BUILD_TESTING before including CTest as CTest defines this variable
 if(DEFINED BUILD_TESTING AND NOT BUILD_TESTING_CHECKED)
-	message(WARNING "Use of option \"BUILD_TESTING\" is deprecated. Use \"tests\" instead.")
+  message(WARNING "Use of option \"BUILD_TESTING\" is deprecated. Use \"tests\" instead.")
 
-	if(NOT tests)
-		# Allow deprecated option to enable tests if they had been disabled otherwise
-		set(tests "${BUILD_TESTING}")
-	endif()
+  if(NOT tests)
+    # Allow deprecated option to enable tests if they had been disabled otherwise
+    set(tests "${BUILD_TESTING}")
+  endif()
 endif()
 
 set(BUILD_TESTING_CHECKED ON INTERNAL CACHE BOOL "Persistent helper variable" FORCE)
 
 if(tests)
-	include(CTest)
+  include(CTest)
 endif()
 
 if (WIN32)
-	set(MUMBLE_TARGET_OS "windows")
+  set(MUMBLE_TARGET_OS "windows")
 elseif (APPLE)
-	set(MUMBLE_TARGET_OS "macos")
+  set(MUMBLE_TARGET_OS "macos")
 elseif (UNIX)
-	set(MUMBLE_TARGET_OS "linux")
+  set(MUMBLE_TARGET_OS "linux")
 else()
-	message(FATAL_ERROR "Unable to determine target OS")
+  message(FATAL_ERROR "Unable to determine target OS")
 endif()
 
 # Get compilation year
 if (use-timestamps)
-	string(TIMESTAMP MUMBLE_BUILD_YEAR "%Y")
+  string(TIMESTAMP MUMBLE_BUILD_YEAR "%Y")
 else()
-	set(MUMBLE_BUILD_YEAR "now")
+  set(MUMBLE_BUILD_YEAR "now")
 endif()
 
 # Make the build year accessible as a macro
@@ -175,102 +175,102 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ${lto})
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF)
 
 if(bundled-utfcpp)
-	add_subdirectory(${3RDPARTY_DIR}/utfcpp)
+  add_subdirectory(${3RDPARTY_DIR}/utfcpp)
 else()
-	find_pkg("utf8cpp" REQUIRED)
-	add_library(utfcpp ALIAS utf8cpp::utf8cpp)
+  find_pkg("utf8cpp" REQUIRED)
+  add_library(utfcpp ALIAS utf8cpp::utf8cpp)
 endif()
 
 if(g15 AND WIN32)
-	add_subdirectory("helpers/g15helper")
+  add_subdirectory("helpers/g15helper")
 endif()
 
 if(APPLE AND MUMBLE_TARGET_ARCH MATCHES "arm.*")
-	# mach_override doesn't support ARM
-	# https://github.com/rentzsch/mach_override/issues/6
-	set(overlay OFF CACHE BOOL "" FORCE)
-	message(STATUS "Disabling the overlay on ARM macOS")
+  # mach_override doesn't support ARM
+  # https://github.com/rentzsch/mach_override/issues/6
+  set(overlay OFF CACHE BOOL "" FORCE)
+  message(STATUS "Disabling the overlay on ARM macOS")
 endif()
 
 if(overlay)
-        if(WIN32)
-                add_subdirectory(overlay)
-        else()
-                if(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64")
-                        add_subdirectory(overlay_gl)
-                endif()
+  if(WIN32)
+    add_subdirectory(overlay)
+  else()
+    if(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64")
+      add_subdirectory(overlay_gl)
+    endif()
 
-                if(APPLE)
-                        add_subdirectory(macx/osax)
-                endif()
-        endif()
+    if(APPLE)
+      add_subdirectory(macx/osax)
+    endif()
+  endif()
 endif()
 
 if(plugins AND client)
-	add_subdirectory(plugins)
+  add_subdirectory(plugins)
 endif()
 
 if (packaging AND WIN32)
-	set(VC_REDIST_PATH "${PROJECT_BINARY_DIR}/installer/VC_redist.x64.exe")
-	file(
-		DOWNLOAD "https://aka.ms/vs/17/release/vc_redist.x64.exe" "${VC_REDIST_PATH}"
-		STATUS VC_REDIST_DOWNLOAD_STATUS
-	)
+  set(VC_REDIST_PATH "${PROJECT_BINARY_DIR}/installer/VC_redist.x64.exe")
+  file(
+  DOWNLOAD "https://aka.ms/vs/17/release/vc_redist.x64.exe" "${VC_REDIST_PATH}"
+  STATUS VC_REDIST_DOWNLOAD_STATUS
+ )
 
-	list(GET VC_REDIST_DOWNLOAD_STATUS 0 STATUS_CODE)
-	if (NOT (STATUS_CODE EQUAL "0"))
-		list(GET VC_REDIST_DOWNLOAD_STATUS 1 ERROR_MSG)
-		message(FATAL_ERROR "Failed at downloading the VC redist installer: ${ERROR_MSG}")
-	endif()
+  list(GET VC_REDIST_DOWNLOAD_STATUS 0 STATUS_CODE)
+  if (NOT (STATUS_CODE EQUAL "0"))
+    list(GET VC_REDIST_DOWNLOAD_STATUS 1 ERROR_MSG)
+    message(FATAL_ERROR "Failed at downloading the VC redist installer: ${ERROR_MSG}")
+  endif()
 
-	execute_process(COMMAND
-		powershell -Command "
-			$exe = (Get-Item -path '${VC_REDIST_PATH}')
-			$exe.VersionInfo.ProductVersion"
-		OUTPUT_VARIABLE VC_REDIST_VERSION
-		RESULT_VARIABLE VC_REDIST_VERSION_STATUS
-	)
+  execute_process(COMMAND
+  powershell -Command "
+   $exe = (Get-Item -path '${VC_REDIST_PATH}')
+   $exe.VersionInfo.ProductVersion"
+  OUTPUT_VARIABLE VC_REDIST_VERSION
+  RESULT_VARIABLE VC_REDIST_VERSION_STATUS
+ )
 
-	if (NOT (VC_REDIST_VERSION_STATUS EQUAL "0"))
-		message(FATAL_ERROR "Failed at extracting the VC redist version")
-	endif()
+  if (NOT (VC_REDIST_VERSION_STATUS EQUAL "0"))
+    message(FATAL_ERROR "Failed at extracting the VC redist version")
+  endif()
 
-	string(STRIP "${VC_REDIST_VERSION}" VC_REDIST_VERSION)
+  string(STRIP "${VC_REDIST_VERSION}" VC_REDIST_VERSION)
 
-	message(STATUS "Using VC redist >= ${VC_REDIST_VERSION} as dependency")
+  message(STATUS "Using VC redist >= ${VC_REDIST_VERSION} as dependency")
 endif()
 
 if(client OR server)
-	add_subdirectory(src)
+  add_subdirectory(src)
 endif()
 
 add_subdirectory(auxiliary_files)
 
 if(packaging)
-	file(COPY
-		${CMAKE_SOURCE_DIR}/installer/gpl.txt
-		${CMAKE_SOURCE_DIR}/installer/lgpl.txt
-		${CMAKE_SOURCE_DIR}/installer/Mumble.rtf
-		${CMAKE_SOURCE_DIR}/installer/portaudio.txt
-		${CMAKE_SOURCE_DIR}/installer/qt.txt
-		${CMAKE_SOURCE_DIR}/installer/speex.txt
-		DESTINATION
-			${CMAKE_BINARY_DIR}/licenses
-	)
-	if(WIN32)
-		file(COPY
-			${CMAKE_SOURCE_DIR}/installer/bannrbmp.bmp
-			${CMAKE_SOURCE_DIR}/installer/dlgbmp.bmp
-			${CMAKE_SOURCE_DIR}/installer/Theme.xml
-			DESTINATION
-				${CMAKE_BINARY_DIR}/installer
-		)
+  file(COPY
+  ${CMAKE_SOURCE_DIR}/installer/gpl.txt
+  ${CMAKE_SOURCE_DIR}/installer/lgpl.txt
+  ${CMAKE_SOURCE_DIR}/installer/Mumble.rtf
+  ${CMAKE_SOURCE_DIR}/installer/portaudio.txt
+  ${CMAKE_SOURCE_DIR}/installer/qt.txt
+  ${CMAKE_SOURCE_DIR}/installer/speex.txt
+  DESTINATION
+   ${CMAKE_BINARY_DIR}/licenses
+ )
+  if(WIN32)
+    file(COPY
+   ${CMAKE_SOURCE_DIR}/installer/bannrbmp.bmp
+   ${CMAKE_SOURCE_DIR}/installer/dlgbmp.bmp
+   ${CMAKE_SOURCE_DIR}/installer/Theme.xml
+   DESTINATION
+    ${CMAKE_BINARY_DIR}/installer
+  )
 
-		file(COPY
-			${CMAKE_SOURCE_DIR}/icons/mumble.ico
-			${CMAKE_SOURCE_DIR}/icons/murmur.ico
-			DESTINATION
-				${CMAKE_BINARY_DIR}/installer/icons
-		)
-	endif()
+    file(COPY
+   ${CMAKE_SOURCE_DIR}/icons/mumble.ico
+   ${CMAKE_SOURCE_DIR}/icons/murmur.ico
+   DESTINATION
+    ${CMAKE_BINARY_DIR}/installer/icons
+  )
+  endif()
 endif()

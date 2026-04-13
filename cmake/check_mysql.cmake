@@ -4,10 +4,10 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 function(check_mysql_connectivity)
-	set(options REQUIRED)
-	set(oneValueArgs USERNAME PASSWORD)
-	set(multiValueArgs "")
-	cmake_parse_arguments(MYSQL_CONNECTIVITY "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(options REQUIRED)
+  set(oneValueArgs USERNAME PASSWORD)
+  set(multiValueArgs "")
+  cmake_parse_arguments(MYSQL_CONNECTIVITY "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-	find_program(MYSQL_CLI "mysql" MYSQL_CONNECTIVITY_REQUIRED)
+  find_program(MYSQL_CLI "mysql" MYSQL_CONNECTIVITY_REQUIRED)
 endfunction()
