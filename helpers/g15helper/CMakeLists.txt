@@ -13,48 +13,48 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/g15helper.plist.in" "${G15HELPER_PLI
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/g15helper.rc.in" "${G15HELPER_RC}")
 
 add_executable(g15-helper WIN32
-	"${CMAKE_SOURCE_DIR}/auxiliary_files/mumble.appcompat.manifest"
-	"${G15HELPER_RC}"
+ "${CMAKE_SOURCE_DIR}/auxiliary_files/mumble.appcompat.manifest"
+ "${G15HELPER_RC}"
 )
 
 set_target_properties(g15-helper
-	PROPERTIES
-		OUTPUT_NAME "mumble-g15-helper"
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+ PROPERTIES
+  OUTPUT_NAME "mumble-g15-helper"
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 target_compile_definitions(g15-helper PRIVATE $<$<CONFIG:Debug>:USE_LOGFILE>)
 
 if(g15-emulator)
-	find_pkg(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
-	set_target_properties(g15-helper PROPERTIES AUTOMOC ON)
-	target_sources(g15-helper PRIVATE "g15helper_emu.cpp" "g15helper_emu.h")
-	target_link_libraries(g15-helper PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+  find_pkg(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+  set_target_properties(g15-helper PROPERTIES AUTOMOC ON)
+  target_sources(g15-helper PRIVATE "g15helper_emu.cpp" "g15helper_emu.h")
+  target_link_libraries(g15-helper PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 
-	if(static AND WIN32 AND TARGET Qt6::QWindowsIntegrationPlugin)
-		include_qt_plugin(g15-helper PRIVATE QWindowsIntegrationPlugin)
-		target_link_libraries(g15-helper PRIVATE Qt6::QWindowsIntegrationPlugin)
-	endif()
+  if(static AND WIN32 AND TARGET Qt6::QWindowsIntegrationPlugin)
+    include_qt_plugin(g15-helper PRIVATE QWindowsIntegrationPlugin)
+    target_link_libraries(g15-helper PRIVATE Qt6::QWindowsIntegrationPlugin)
+  endif()
 else()
-	if(MSVC)
-		set_target_properties(g15-helper PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	endif()
+  if(MSVC)
+    set_target_properties(g15-helper PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+  endif()
 
-	target_sources(g15-helper PRIVATE "g15helper.c" "g15helper.h")
+  target_sources(g15-helper PRIVATE "g15helper.c" "g15helper.h")
 
-	if(NOT G15_DIR)
-		set(G15_DIR "${3RDPARTY_DIR}/g15")
-	endif()
+  if(NOT G15_DIR)
+    set(G15_DIR "${3RDPARTY_DIR}/g15")
+  endif()
 
-	if(64_BIT)
-		find_library(LIB_LGLCD "lglcd" HINTS "${G15_DIR}/Lib/x64")
-	else()
-		find_library(LIB_LGLCD "lglcd" HINTS "${G15_DIR}/Lib/x86")
-	endif()
+  if(64_BIT)
+    find_library(LIB_LGLCD "lglcd" HINTS "${G15_DIR}/Lib/x64")
+  else()
+    find_library(LIB_LGLCD "lglcd" HINTS "${G15_DIR}/Lib/x86")
+  endif()
 
-	target_include_directories(g15-helper PRIVATE "${G15_DIR}/Src")
+  target_include_directories(g15-helper PRIVATE "${G15_DIR}/Src")
 
-	target_link_libraries(g15-helper PRIVATE ${LIB_LGLCD})
+  target_link_libraries(g15-helper PRIVATE ${LIB_LGLCD})
 endif()
 
 install(TARGETS g15-helper RUNTIME DESTINATION "${MUMBLE_INSTALL_EXECUTABLEDIR}" COMPONENT mumble_client)

@@ -7,8 +7,8 @@
 # (for injection into running processes)
 
 add_library(MumbleOverlay MODULE
-	"osax.m"
-	"MumbleOverlay.sdef"
+ "osax.m"
+ "MumbleOverlay.sdef"
 )
 
 # The overlay doesn't work well with unity builds
@@ -17,19 +17,19 @@ set_target_properties(MumbleOverlay PROPERTIES UNITY_BUILD FALSE)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/osax.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/osax.plist")
 
 set_target_properties(MumbleOverlay
-	PROPERTIES
-		BUNDLE TRUE
-		BUNDLE_EXTENSION "osax"
-		RESOURCE "MumbleOverlay.sdef"
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-		MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/osax.plist"
+ PROPERTIES
+  BUNDLE TRUE
+  BUNDLE_EXTENSION "osax"
+  RESOURCE "MumbleOverlay.sdef"
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+  MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/osax.plist"
 )
 
 find_library(LIB_COCOA "Cocoa")
 find_library(LIB_FOUNDATION "Foundation")
 
 target_link_libraries(MumbleOverlay
-	PRIVATE
-		${LIB_COCOA}
-		${LIB_FOUNDATION}
+ PRIVATE
+  ${LIB_COCOA}
+  ${LIB_FOUNDATION}
 )

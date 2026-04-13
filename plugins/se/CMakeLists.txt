@@ -4,15 +4,15 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_library(se SHARED
-	"se.cpp"
+ "se.cpp"
 
-	"../Module.cpp"
-	"../ProcessBase.cpp"
-	"../ProcessWindows.cpp"
+ "../Module.cpp"
+ "../ProcessBase.cpp"
+ "../ProcessWindows.cpp"
 )
 
 if(WIN32)
-	target_sources(se PRIVATE "../HostWindows.cpp")
+  target_sources(se PRIVATE "../HostWindows.cpp")
 else()
-	target_sources(se PRIVATE "../HostLinux.cpp" "../ProcessLinux.cpp")
+  target_sources(se PRIVATE "../HostLinux.cpp" "../ProcessLinux.cpp")
 endif()

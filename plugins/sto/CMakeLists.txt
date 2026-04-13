@@ -5,7 +5,7 @@
 
 set(PLUGIN_RETRACTED ON PARENT_SCOPE)
 if(retracted-plugins)
-	add_library(sto SHARED "../null_plugin.cpp")
+  add_library(sto SHARED "../null_plugin.cpp")
 
-	target_compile_definitions(sto PRIVATE "NULL_DESC=L\"Star Trek Online (retracted due to lack of maintenance)\"")
+  target_compile_definitions(sto PRIVATE "NULL_DESC=L\"Star Trek Online (retracted due to lack of maintenance)\"")
 endif()

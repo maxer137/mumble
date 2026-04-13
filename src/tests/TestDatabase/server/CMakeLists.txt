@@ -4,10 +4,10 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_executable(TestServerDatabase
-	ServerDatabaseTest.cpp
-	JSONAssembler.cpp
+ ServerDatabaseTest.cpp
+ JSONAssembler.cpp
 
-	"${CMAKE_CURRENT_SOURCE_DIR}/../TestUtils.cpp"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../TestUtils.cpp"
 )
 
 target_compile_definitions(TestServerDatabase PRIVATE ${MUMBLE_DB_TEST_DEFINES})
@@ -25,18 +25,18 @@ set(input_table_data_paths)
 set(migrated_table_data_paths)
 
 macro(add_table_pair input migrated)
-	set(input_path "${CMAKE_CURRENT_SOURCE_DIR}/table_data/${input}")
-	set(migrated_path "${CMAKE_CURRENT_SOURCE_DIR}/table_data/${migrated}")
+  set(input_path "${CMAKE_CURRENT_SOURCE_DIR}/table_data/${input}")
+  set(migrated_path "${CMAKE_CURRENT_SOURCE_DIR}/table_data/${migrated}")
 
-	if(NOT EXISTS "${input_path}")
-		message(FATAL_ERROR "Can't find JSON table definition at '${input_path}'")
-	endif()
-	if(NOT EXISTS "${migrated_path}")
-		message(FATAL_ERROR "Can't find JSON table definition at '${migrated_path}'")
-	endif()
+  if(NOT EXISTS "${input_path}")
+    message(FATAL_ERROR "Can't find JSON table definition at '${input_path}'")
+  endif()
+  if(NOT EXISTS "${migrated_path}")
+    message(FATAL_ERROR "Can't find JSON table definition at '${migrated_path}'")
+  endif()
 
-	list(APPEND input_table_data_paths "${input_path}")
-	list(APPEND migrated_table_data_paths "${migrated_path}")
+  list(APPEND input_table_data_paths "${input_path}")
+  list(APPEND migrated_table_data_paths "${migrated_path}")
 endmacro()
 
 add_table_pair("meta_table_input.json" "meta_table_migrated.json")
@@ -59,10 +59,10 @@ math(EXPR max_idx "${max_idx} - 1")
 
 set(JSON_TABLE_PAIRS "")
 foreach(current_idx RANGE ${max_idx})
-	list(GET input_table_data_paths ${current_idx} current_input_path)
-	list(GET migrated_table_data_paths ${current_idx} current_migrated_path)
+  list(GET input_table_data_paths ${current_idx} current_input_path)
+  list(GET migrated_table_data_paths ${current_idx} current_migrated_path)
 
-	set(JSON_TABLE_PAIRS "${JSON_TABLE_PAIRS}{ \"${current_input_path}\", \"${current_migrated_path}\" },\n")
+  set(JSON_TABLE_PAIRS "${JSON_TABLE_PAIRS}{ \"${current_input_path}\", \"${current_migrated_path}\" },\n")
 endforeach()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/JSONLocator.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/JSONLocator.cpp")

@@ -4,14 +4,14 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_library(grounded SHARED
-	"grounded.cpp"
+ "grounded.cpp"
 
-	"../Module.cpp"
-	"../ProcessBase.cpp"
-	"../ProcessWindows.cpp")
+ "../Module.cpp"
+ "../ProcessBase.cpp"
+ "../ProcessWindows.cpp")
 
 if(WIN32)
-	target_sources(grounded PRIVATE "../HostWindows.cpp")
+  target_sources(grounded PRIVATE "../HostWindows.cpp")
 else()
-	target_sources(grounded PRIVATE "../HostLinux.cpp")
+  target_sources(grounded PRIVATE "../HostLinux.cpp")
 endif()

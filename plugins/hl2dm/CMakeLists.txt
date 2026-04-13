@@ -5,7 +5,7 @@
 
 set(PLUGIN_RETRACTED ON PARENT_SCOPE)
 if(retracted-plugins)
-	add_library(hl2dm SHARED "../null_plugin.cpp")
+  add_library(hl2dm SHARED "../null_plugin.cpp")
 
-	target_compile_definitions(hl2dm PRIVATE "NULL_DESC=L\"Half-Life 2: Deathmatch (retracted, now using Link)\"")
+  target_compile_definitions(hl2dm PRIVATE "NULL_DESC=L\"Half-Life 2: Deathmatch (retracted, now using Link)\"")
 endif()

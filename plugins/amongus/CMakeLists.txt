@@ -4,18 +4,18 @@
 # Mumble source tree or at <https://www.mumble.info/LICENSE>.
 
 add_library(amongus SHARED
-	"amongus.cpp"
-	"Game.cpp"
+ "amongus.cpp"
+ "Game.cpp"
 
-	"../Module.cpp"
-	"../ProcessBase.cpp"
-	"../ProcessWindows.cpp"
+ "../Module.cpp"
+ "../ProcessBase.cpp"
+ "../ProcessWindows.cpp"
 )
 
 if(WIN32)
-	target_sources(amongus PRIVATE "../HostWindows.cpp")
+  target_sources(amongus PRIVATE "../HostWindows.cpp")
 else()
-	target_sources(amongus PRIVATE "../HostLinux.cpp")
+  target_sources(amongus PRIVATE "../HostLinux.cpp")
 endif()
 
 target_link_libraries(amongus PRIVATE utfcpp)
