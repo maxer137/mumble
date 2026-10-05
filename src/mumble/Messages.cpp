@@ -862,6 +862,10 @@ void MainWindow::msgUserState(const MumbleProto::UserState &msg) {
 		pmModel->setCommentHash(pDst, blob(msg.comment_hash()));
 	if (msg.has_comment())
 		pmModel->setComment(pDst, u8(msg.comment()));
+
+	// Someone joined or left our channel, we changed channel, or someone's video capabilities changed
+	if (msg.has_channel_id() || msg.has_video_capabilities())
+		updateScreenShareEncoderSelection();
 }
 
 /// This message is being received when a user was removed. This might be because the user disconnected or because
@@ -916,8 +920,10 @@ void MainWindow::msgUserRemove(const MumbleProto::UserRemove &msg) {
 								  Q_ARG(unsigned int, pDst->uiSession));
 	}
 
-	if (pDst != pSelf)
+	if (pDst != pSelf) {
 		pmModel->removeUser(pDst);
+		updateScreenShareEncoderSelection();
+	}
 }
 
 /// This message is being received when the server informs the local client about channel properties (either during

@@ -4298,6 +4298,7 @@ void MainWindow::screenShare() {
 					},
 					Qt::SingleShotConnection);
 
+				updateScreenShareEncoderSelection();
 				sc->startCaptureNative();
 				return; // Don't send UserState yet — wait for captureStarted.
 			}
@@ -4313,6 +4314,7 @@ void MainWindow::screenShare() {
 		}
 		Global::get().sc->setSource(dlg.selectedSource());
 #endif
+		updateScreenShareEncoderSelection();
 		Global::get().sc->startCapture();
 
 		MumbleProto::UserState mpus;
@@ -4347,6 +4349,26 @@ void MainWindow::onRemoteFrameDecoded(quint32 senderSession, QImage frame) {
 	// Ideally, the user should subcribe to the server. Otherwise, when a user doesn't have the stream open
 	// it will use bandwith for no reason
 	viewer->updateFrame(frame);
+}
+
+void MainWindow::updateScreenShareEncoderSelection() {
+#ifdef USE_SCREEN_SHARING
+	ClientUser *self = ClientUser::get(Global::get().uiSession);
+	if (!Global::get().sc || !self || !self->cChannel)
+		return;
+
+	VideoEncoderSelection selection;
+	selection.mode          = Global::get().s.screenShareEncoderMode;
+	selection.manualEncoder = Global::get().s.screenShareEncoder;
+	// The server relays video to the users in the sender's channel
+	for (const User *user : self->cChannel->qlUsers) {
+		const ClientUser *viewer = static_cast< const ClientUser * >(user);
+		if (viewer != self && viewer->m_videoDecoders)
+			selection.viewerDecoders.push_back(*viewer->m_videoDecoders);
+	}
+
+	Global::get().sc->setEncoderSelection(selection);
+#endif
 }
 
 void MainWindow::requestScreenShareKeyFrame(quint32 senderSession) {
