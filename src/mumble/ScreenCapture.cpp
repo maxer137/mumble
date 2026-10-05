@@ -107,6 +107,10 @@ void ScreenCapture::setEncoderSelection(const VideoEncoderSelection &selection) 
 	m_encoder->setSelection(selection);
 }
 
+void ScreenCapture::setBitrate(int bitrate) {
+	m_encoder->setBitrate(bitrate);
+}
+
 void ScreenCapture::setSource(const CaptureSource &source) {
 	m_source = source;
 }

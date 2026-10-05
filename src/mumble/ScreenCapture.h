@@ -75,6 +75,9 @@ public:
 	/// stream switches to a different encoder if necessary.
 	void setEncoderSelection(const VideoEncoderSelection &selection);
 
+	/// Sets the target bit rate of the video in bits per second. May be called while capturing.
+	void setBitrate(int bitrate);
+
 	/// Sets the capture source for the non-native picker path. Call before startCapture().
 	void setSource(const CaptureSource &source);
 

@@ -42,8 +42,12 @@ public:
 	// For now these values seem alright for testing
 	static constexpr int FPS                  = 15;
 	static constexpr qint64 FRAME_INTERVAL_US = 1'000'000 / FPS;
-	/// Target bit rate in bits per second
-	static constexpr int BITRATE = 1'500'000;
+	/// Target bit rate in bits per second, unless the server's bandwidth limit calls for less
+	static constexpr int DEFAULT_BITRATE = 1'500'000;
+
+	/// Returns the bit rate to encode at, in bits per second, for the given bandwidth limit of the server
+	/// (0 if there is none).
+	static int bitrateFor(unsigned int maxBandwidth);
 
 	explicit VideoEncoder(QObject *parent = nullptr);
 	~VideoEncoder() override;
@@ -65,6 +69,10 @@ public:
 	/// Sets what the choice of the encoder is based on. The selection is kept across streams.
 	void setSelection(const VideoEncoderSelection &selection);
 
+	/// Sets the target bit rate in bits per second. When streaming, the encoder is opened again with the new bit
+	/// rate, starting with a key frame. The bit rate is kept across streams.
+	void setBitrate(int bitrate);
+
 signals:
 	/// Emitted for every successfully encoded frame.
 	void frameEncoded(const EncodedVideoFrame &frame);
@@ -74,6 +82,7 @@ private:
 	void processStop();
 	void processKeyFrameRequest();
 	void processSelection(const VideoEncoderSelection &selection);
+	void processBitrate(int bitrate);
 	/// Encodes the incoming frame if the frame rate allows it, or schedules it for the next frame slot.
 	void processIncomingFrame();
 
@@ -116,6 +125,7 @@ private:
 
 	/// IDs of the encoders to use, most preferred first
 	QStringList m_encoderOrder;
+	int m_bitrate = DEFAULT_BITRATE;
 	std::unique_ptr< VideoEncoderBackend > m_backend;
 	/// Picture size m_backend was opened for (or tried to)
 	int m_encoderWidth  = 0;

@@ -67,6 +67,23 @@ void VideoEncoder::setSelection(const VideoEncoderSelection &selection) {
 		this, [this, selection]() { processSelection(selection); }, Qt::QueuedConnection);
 }
 
+void VideoEncoder::setBitrate(int bitrate) {
+	QMetaObject::invokeMethod(
+		this, [this, bitrate]() { processBitrate(bitrate); }, Qt::QueuedConnection);
+}
+
+int VideoEncoder::bitrateFor(unsigned int maxBandwidth) {
+	if (maxBandwidth == 0)
+		return DEFAULT_BITRATE;
+
+	// Leave room for the packet overhead and for the encoder overshooting its target for a moment, as the server
+	// drops whatever exceeds the limit. Encoding at a very low bit rate isn't of any use either.
+	static constexpr double HEADROOM = 0.8;
+	static constexpr int MIN_BITRATE = 50'000;
+	return static_cast< int >(std::clamp(maxBandwidth * HEADROOM, static_cast< double >(MIN_BITRATE),
+										 static_cast< double >(DEFAULT_BITRATE)));
+}
+
 qint64 VideoEncoder::now() const {
 	return m_streamClock.nsecsElapsed() / 1000;
 }
@@ -108,6 +125,21 @@ void VideoEncoder::processSelection(const VideoEncoderSelection &selection) {
 
 	// Switch over to the now preferred encoder with the next frame. Viewers need a key frame for the new codec
 	// right away, even if the screen content doesn't change.
+	m_backend.reset();
+	m_encoderWidth  = 0;
+	m_encoderHeight = 0;
+	forceKeyFrame();
+}
+
+void VideoEncoder::processBitrate(int bitrate) {
+	if (bitrate == m_bitrate)
+		return;
+	m_bitrate = bitrate;
+
+	if (!m_backend)
+		return;
+
+	// Encoders can't generally change their bit rate on the fly, so open the encoder again with the next frame
 	m_backend.reset();
 	m_encoderWidth  = 0;
 	m_encoderHeight = 0;
@@ -236,7 +268,7 @@ bool VideoEncoder::openBackend(int width, int height) {
 	VideoEncoderConfig config;
 	config.width            = width;
 	config.height           = height;
-	config.bitrate          = BITRATE;
+	config.bitrate          = m_bitrate;
 	config.fps              = FPS;
 	config.keyFrameInterval = VIDEO_GOP_SIZE;
 
