@@ -924,6 +924,8 @@ if(screen-sharing)
 						"ScreenShareReceiver.cpp"
 						"VideoEncoder.h"
 						"VideoEncoder.cpp"
+						"VideoSender.h"
+						"VideoSender.cpp"
 				)
 
 	if(WIN32)
