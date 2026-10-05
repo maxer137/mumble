@@ -478,6 +478,7 @@ public:
 	void screenShare();
 	void sendScreenShareFrame(const EncodedVideoFrame &frame);
 	void onRemoteFrameDecoded(quint32 senderSession, QImage frame);
+	void requestScreenShareKeyFrame(quint32 senderSession);
 	void onRemoteScreenShareStopped(quint32 senderSession);
 	void openSelfCommentDialog();
 	void changeServerTexture();

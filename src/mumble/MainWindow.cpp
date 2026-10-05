@@ -231,6 +231,8 @@ MainWindow::MainWindow(QWidget *p)
 	connect(m_screenShareThread, &QThread::finished, Global::get().screenShareReceiver, &QObject::deleteLater);
 	connect(Global::get().screenShareReceiver, &ScreenShareReceiver::frameDecoded, this,
 			&MainWindow::onRemoteFrameDecoded, Qt::QueuedConnection);
+	connect(Global::get().screenShareReceiver, &ScreenShareReceiver::keyFrameNeeded, this,
+			&MainWindow::requestScreenShareKeyFrame, Qt::QueuedConnection);
 	m_screenShareThread->start();
 }
 
@@ -4278,6 +4280,15 @@ void MainWindow::onRemoteFrameDecoded(quint32 senderSession, QImage frame) {
 
 	ScreenShareViewer *viewer = m_screenShareViewers[senderSession];
 	viewer->updateFrame(frame);
+}
+
+void MainWindow::requestScreenShareKeyFrame(quint32 senderSession) {
+	if (!Global::get().sh)
+		return;
+
+	MumbleProto::VideoKeyFrameRequest mpvkfr;
+	mpvkfr.set_session(senderSession);
+	Global::get().sh->sendMessage(mpvkfr);
 }
 
 void MainWindow::onRemoteScreenShareStopped(quint32 senderSession) {
