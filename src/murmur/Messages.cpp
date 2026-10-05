@@ -1144,7 +1144,11 @@ void Server::msgUserState(ServerUser *uSource, MumbleProto::UserState &msg) {
 		}
 
 		if (pDstServerUser->m_videoDecoders != decoders) {
-			pDstServerUser->m_videoDecoders = decoders;
+			{
+				// The list is used by the voice thread when relaying video
+				QWriteLocker wl(&qrwlVoiceThread);
+				pDstServerUser->m_videoDecoders = decoders;
+			}
 
 			// Relay the cleaned up list. An empty list still has to be sent, so the field has to be set either way.
 			MumbleProto::UserState_VideoCapabilities *capabilities = msg.mutable_video_capabilities();

@@ -1233,12 +1233,22 @@ void Server::processVideoMsg(ServerUser *u, const Mumble::Protocol::VideoData &v
 		return;
 	}
 
+	const unsigned int codec = static_cast< unsigned int >(videoData.codec);
+
 	// Broadcast packet to all users in channel
 	for (User *p : u->cChannel->qlUsers) {
 		ServerUser *dst = static_cast< ServerUser * >(p);
 
 		if (dst == u)
 			continue;
+
+		// Only send video to clients that told us they can decode it. This also leaves out clients that don't
+		// support video at all, which would just drop it.
+		if (!dst->m_videoDecoders
+			|| std::find(dst->m_videoDecoders->begin(), dst->m_videoDecoders->end(), codec)
+				   == dst->m_videoDecoders->end()) {
+			continue;
+		}
 
 		sendMessage(*dst, packet.data(), static_cast< int >(packet.size()), cache);
 	}
