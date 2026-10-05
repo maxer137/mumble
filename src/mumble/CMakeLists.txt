@@ -922,8 +922,12 @@ if(screen-sharing)
 						"ScreenPickerDialog.cpp"
 						"ScreenShareReceiver.h"
 						"ScreenShareReceiver.cpp"
+						"FFmpegVideoEncoder.h"
+						"FFmpegVideoEncoder.cpp"
 						"VideoEncoder.h"
 						"VideoEncoder.cpp"
+						"VideoEncoderBackend.h"
+						"VideoEncoderBackend.cpp"
 						"VideoSender.h"
 						"VideoSender.cpp"
 				)
