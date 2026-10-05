@@ -159,6 +159,8 @@ MetaParams::MetaParams() {
 
 	allowRecording = true;
 
+	allowScreenSharing = true;
+
 	rollingStatsWindow = 300;
 
 	qsSettings = nullptr;
@@ -382,6 +384,8 @@ void MetaParams::read(QString fname) {
 	bLogACLChanges   = typeCheckedFromSettings("logaclchanges", bLogACLChanges);
 
 	allowRecording = typeCheckedFromSettings("allowRecording", allowRecording);
+
+	allowScreenSharing = typeCheckedFromSettings("allowScreenSharing", allowScreenSharing);
 
 	rollingStatsWindow = typeCheckedFromSettings("rollingStatsWindow", rollingStatsWindow);
 
