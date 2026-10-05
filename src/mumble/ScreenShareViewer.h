@@ -30,6 +30,10 @@ public:
 public slots:
 	void updateFrame(QImage frame);
 
+signals:
+	/// Emitted when the window gets closed, by the user or otherwise.
+	void closed(quint32 senderSession);
+
 protected:
 	void resizeEvent(QResizeEvent *event) override;
 	void closeEvent(QCloseEvent *event) override;

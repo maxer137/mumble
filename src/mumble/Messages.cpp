@@ -880,6 +880,8 @@ void MainWindow::msgUserState(const MumbleProto::UserState &msg) {
 	// Someone joined or left our channel, we changed channel, or someone's video capabilities changed
 	if (msg.has_channel_id() || msg.has_video_capabilities())
 		updateScreenShareEncoderSelection();
+	if (msg.has_channel_id())
+		updateScreenShareSubscriptions();
 }
 
 /// This message is being received when a user was removed. This might be because the user disconnected or because
@@ -937,6 +939,7 @@ void MainWindow::msgUserRemove(const MumbleProto::UserRemove &msg) {
 	if (pDst != pSelf) {
 		pmModel->removeUser(pDst);
 		updateScreenShareEncoderSelection();
+		updateScreenShareSubscriptions();
 	}
 }
 

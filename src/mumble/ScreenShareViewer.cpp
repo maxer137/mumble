@@ -44,6 +44,8 @@ void ScreenShareViewer::closeEvent(QCloseEvent *event) {
 	// automatically when new frames arrive.
 	m_dismissed = true;
 	QDialog::closeEvent(event);
+
+	emit closed(m_senderSession);
 }
 
 void ScreenShareViewer::updateImageDisplay() {

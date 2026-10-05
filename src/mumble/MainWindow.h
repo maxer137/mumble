@@ -130,6 +130,13 @@ public:
 
 	VoiceRecorderDialog *voiceRecorderDialog;
 	QMap< quint32, ScreenShareViewer * > m_screenShareViewers;
+	/// Sessions of the users whose screen share we receive, i.e. whose viewer is open. The server only relays
+	/// video to subscribers.
+	QSet< quint32 > m_screenShareSubscriptions;
+	/// Returns the viewer for the given user's screen share, creating it if necessary.
+	ScreenShareViewer *screenShareViewer(quint32 senderSession);
+	void subscribeToScreenShare(quint32 senderSession);
+	void unsubscribeFromScreenShare(quint32 senderSession);
 	/// Thread that Global::get().screenShareReceiver lives on.
 	QThread *m_screenShareThread = nullptr;
 	/// Sends our own screen share stream. Lives on m_videoSenderThread and is deleted there once it has finished.
@@ -492,6 +499,9 @@ public:
 	/// the users in our channel can decode. Has to be called whenever any of these changes.
 	void updateScreenShareEncoderSelection();
 	void onRemoteScreenShareStopped(quint32 senderSession);
+	/// Closes the viewers of the screen shares that the server doesn't relay to us anymore, because we or the
+	/// sharing user changed channel or the sharing user left.
+	void updateScreenShareSubscriptions();
 	void openSelfCommentDialog();
 	void changeServerTexture();
 	void removeServerTexture();
