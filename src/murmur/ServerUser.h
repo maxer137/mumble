@@ -69,6 +69,29 @@ struct WhisperTarget {
 	std::vector< WhisperTarget::Channel > channels;
 };
 
+/// Limits the bandwidth of a user's screen share.
+///
+/// This is a token bucket that is refilled at the allowed rate. It holds what may be sent within a couple of
+/// seconds, as key frames are much larger than the frames in between: a stream that stays within the limit on
+/// average still gets through, even though it exceeds it for a moment with every key frame.
+class VideoBandwidthLimiter {
+public:
+	/// @param size The size of the packet in bytes
+	/// @param maxBitsPerSecond The allowed bandwidth in bits per second, or 0 if there is no limit
+	/// @returns Whether the packet may be relayed
+	bool allow(std::size_t size, unsigned int maxBitsPerSecond);
+
+private:
+	/// How much may be sent at once, as time at the allowed rate
+	static constexpr double BURST_SECONDS = 2.0;
+
+	std::mutex m_mutex;
+	/// Time since the bucket was last refilled
+	Timer m_lastRefill;
+	/// Number of bytes that may be sent right now
+	double m_budget = 0;
+};
+
 class ServerUser;
 
 struct WhisperTargetCache {
@@ -172,6 +195,7 @@ public:
 	SOCKET sUdpSocket;
 #endif
 	BandwidthRecord bwr;
+	VideoBandwidthLimiter m_videoBandwidth;
 	struct sockaddr_storage saiUdpAddress;
 	struct sockaddr_storage saiTcpLocalAddress;
 

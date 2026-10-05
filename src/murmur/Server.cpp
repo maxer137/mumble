@@ -362,6 +362,7 @@ void Server::readParams() {
 	usPort                             = static_cast< unsigned short >(Meta::mp->usPort + iServerNum);
 	iTimeout                           = Meta::mp->iTimeout;
 	iMaxBandwidth                      = Meta::mp->iMaxBandwidth;
+	m_maxVideoBandwidth                = Meta::mp->maxVideoBandwidth;
 	iMaxUsers                          = Meta::mp->iMaxUsers;
 	iMaxUsersPerChannel                = Meta::mp->iMaxUsersPerChannel;
 	iMaxTextMessageLength              = Meta::mp->iMaxTextMessageLength;
@@ -434,6 +435,7 @@ void Server::readParams() {
 	m_dbWrapper.getConfigurationTo(iServerNum, "port", usPort);
 	m_dbWrapper.getConfigurationTo(iServerNum, "timeout", iTimeout);
 	m_dbWrapper.getConfigurationTo(iServerNum, "bandwidth", iMaxBandwidth);
+	m_dbWrapper.getConfigurationTo(iServerNum, "videobandwidth", m_maxVideoBandwidth);
 	m_dbWrapper.getConfigurationTo(iServerNum, "users", iMaxUsers);
 	m_dbWrapper.getConfigurationTo(iServerNum, "usersperchannel", iMaxUsersPerChannel);
 	m_dbWrapper.getConfigurationTo(iServerNum, "textmessagelength", iMaxTextMessageLength);
@@ -530,6 +532,14 @@ void Server::setLiveConf(const QString &key, const QString &value) {
 			iMaxBandwidth = length;
 			MumbleProto::ServerConfig mpsc;
 			mpsc.set_max_bandwidth(static_cast< unsigned int >(length));
+			sendAll(mpsc);
+		}
+	} else if (key == "videobandwidth") {
+		unsigned int bandwidth = !v.isNull() ? v.toUInt() : Meta::mp->maxVideoBandwidth;
+		if (bandwidth != m_maxVideoBandwidth) {
+			m_maxVideoBandwidth = bandwidth;
+			MumbleProto::ServerConfig mpsc;
+			mpsc.set_max_video_bandwidth(bandwidth);
 			sendAll(mpsc);
 		}
 	} else if (key == "users") {
@@ -1221,6 +1231,11 @@ void Server::processVideoMsg(ServerUser *u, const Mumble::Protocol::VideoData &v
 
 	if (u->sState != ServerUser::Authenticated || !u->bScreenSharing || !u->cChannel)
 		return;
+
+	// IP + UDP + Crypt + Data
+	if (!u->m_videoBandwidth.allow(20 + 8 + 4 + videoData.payload.size(), m_maxVideoBandwidth)) {
+		return;
+	}
 
 	QByteArray cache;
 

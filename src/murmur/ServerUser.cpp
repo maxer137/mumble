@@ -15,6 +15,7 @@
 
 #include "crypto/CryptStateOCB2.h"
 
+#include <algorithm>
 #include <chrono>
 
 ServerUser::ServerUser(Server *p, QSslSocket *socket)
@@ -226,6 +227,27 @@ bool LeakyBucket::ratelimit(int tokens) {
 	}
 
 	return limit;
+}
+
+bool VideoBandwidthLimiter::allow(std::size_t size, unsigned int maxBitsPerSecond) {
+	std::lock_guard< std::mutex > lock(m_mutex);
+
+	// The time is taken even without a limit, so that a limit that is set later on doesn't start out with the
+	// budget of all the time before
+	const double elapsedSeconds = static_cast< double >(m_lastRefill.restart().count()) / 1'000'000.0;
+	if (maxBitsPerSecond == 0) {
+		return true;
+	}
+
+	const double bytesPerSecond = static_cast< double >(maxBitsPerSecond) / 8.0;
+	m_budget                    = std::min(m_budget + elapsedSeconds * bytesPerSecond, bytesPerSecond * BURST_SECONDS);
+
+	if (m_budget < static_cast< double >(size)) {
+		return false;
+	}
+
+	m_budget -= static_cast< double >(size);
+	return true;
 }
 
 void ServerUser::rejectConnection(bool forceDisconnect) {

@@ -118,6 +118,7 @@ public:
 	unsigned short usPort;
 	int iTimeout;
 	int iMaxBandwidth;
+	unsigned int m_maxVideoBandwidth;
 	unsigned int iMaxUsers;
 	unsigned int iMaxUsersPerChannel;
 	unsigned int iDefaultChan;
