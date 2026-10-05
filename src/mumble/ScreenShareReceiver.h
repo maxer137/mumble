@@ -58,6 +58,10 @@ public:
 	/// Tear down decoder state for a sender who stopped sharing. May be called from any thread.
 	void resetSender(quint32 senderSession);
 
+	/// The video codecs that can be decoded. This opens a decoder for every codec, so it should not be called
+	/// more often than necessary.
+	static std::vector< MumbleUDP::Video::Codec > supportedCodecs();
+
 signals:
 	void frameDecoded(quint32 senderSession, QImage frame);
 	/// Emitted from the receiver's thread when the stream of the given sender can't be decoded until its next
@@ -158,8 +162,6 @@ private:
 		AVFrame *frame                = nullptr;
 		AVPacket *packet              = nullptr;
 		SwsContext *swsCtx            = nullptr;
-		int swsWidth                  = 0;
-		int swsHeight                 = 0;
 		MumbleUDP::Video::Codec codec = MumbleUDP::Video::H264;
 		/// Drop P-frames until the decoder has seen at least one IDR keyframe.
 		bool gotKeyFrame = false;

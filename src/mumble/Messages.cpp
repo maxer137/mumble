@@ -28,6 +28,7 @@
 #include "PluginManager.h"
 #include "ProtoUtils.h"
 #include "ScreenCapture.h"
+#include "ScreenShareReceiver.h"
 #include "ServerHandler.h"
 #include "TalkingUI.h"
 #include "User.h"
@@ -190,6 +191,17 @@ void MainWindow::msgServerSync(const MumbleProto::ServerSync &msg) {
 
 
 	Global::get().sh->setServerSynchronized(true);
+
+#ifdef USE_SCREEN_SHARING
+	// Tell everyone which video codecs we can decode, so that those sharing their screen can pick one of them
+	MumbleProto::UserState mpus;
+	mpus.set_session(Global::get().uiSession);
+	MumbleProto::UserState_VideoCapabilities *capabilities = mpus.mutable_video_capabilities();
+	for (MumbleUDP::Video::Codec codec : ScreenShareReceiver::supportedCodecs()) {
+		capabilities->add_decoders(static_cast< unsigned int >(codec));
+	}
+	Global::get().sh->sendMessage(mpus);
+#endif
 
 	emit serverSynchronized();
 }
@@ -596,6 +608,11 @@ void MainWindow::msgUserState(const MumbleProto::UserState &msg) {
 				}
 			}
 		}
+	}
+
+	if (msg.has_video_capabilities()) {
+		const auto &decoders = msg.video_capabilities().decoders();
+		pDst->setVideoDecoders(std::vector< unsigned int >(decoders.begin(), decoders.end()));
 	}
 
 	if (msg.has_screen_sharing()) {
