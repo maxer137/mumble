@@ -222,9 +222,16 @@ MainWindow::MainWindow(QWidget *p)
 
 	// Create the screen-share receiver and connect its frameDecoded signal so that decoded
 	// frames from remote users are delivered on the GUI thread (queued connection).
-	Global::get().screenShareReceiver = new ScreenShareReceiver(this);
+	// The receiver lives on its own thread so that neither the network thread nor the GUI is blocked by
+	// reassembly and decoding. It is deleted on that thread once the thread has finished.
+	m_screenShareThread = new QThread(this);
+	m_screenShareThread->setObjectName(QLatin1String("ScreenShareReceiver"));
+	Global::get().screenShareReceiver = new ScreenShareReceiver();
+	Global::get().screenShareReceiver->moveToThread(m_screenShareThread);
+	connect(m_screenShareThread, &QThread::finished, Global::get().screenShareReceiver, &QObject::deleteLater);
 	connect(Global::get().screenShareReceiver, &ScreenShareReceiver::frameDecoded, this,
 			&MainWindow::onRemoteFrameDecoded, Qt::QueuedConnection);
+	m_screenShareThread->start();
 }
 
 // Loading a state that was stored by a different version of Qt can lead to a crash.
@@ -656,6 +663,10 @@ void MainWindow::setShowDockTitleBars(bool doShow) {
 }
 
 MainWindow::~MainWindow() {
+	m_screenShareThread->quit();
+	m_screenShareThread->wait();
+	Global::get().screenShareReceiver = nullptr;
+
 	delete qwPTTButtonWidget;
 	delete qdwLog->titleBarWidget();
 	delete pmModel;
