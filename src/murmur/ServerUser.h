@@ -20,6 +20,7 @@
 #include "Timer.h"
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QSet>
 #include <QtCore/QStringList>
 
 #ifdef Q_OS_WIN
@@ -177,6 +178,9 @@ public:
 	/// Video codecs (MumbleUDP::Video::Codec values) the user's client can decode, or nothing if the client
 	/// never announced them.
 	std::optional< std::vector< unsigned int > > m_videoDecoders;
+	/// Sessions of the users whose screen share this user wants to receive. As this is used by the voice
+	/// thread when relaying video, it is only changed while holding the voice thread lock.
+	QSet< unsigned int > m_videoSubscriptions;
 
 	QStringList qslAccessTokens;
 
