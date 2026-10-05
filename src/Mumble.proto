@@ -621,6 +621,8 @@ message ServerConfig {
 	// Whether users may share their screen on the server. Servers that don't support screen sharing at all
 	// don't send this field.
 	optional bool screen_sharing_allowed = 8;
+	// The maximum bandwidth a user's screen share may use, in bits per second. 0 means that there is no limit.
+	optional uint32 max_video_bandwidth = 9;
 }
 
 // Sent by the server to inform the clients of suggested client configuration
