@@ -480,6 +480,10 @@ public:
 	void toggleSelfPrioritySpeaker();
 	void recording();
 	void screenShare();
+	/// Stops capturing and sending our screen, without telling the server.
+	void stopScreenShareCapture();
+	/// Enables the screen share action if we may share our screen, and always while we do.
+	void updateScreenShareAction();
 	void onRemoteFrameDecoded(quint32 senderSession, QImage frame);
 	void requestScreenShareKeyFrame(quint32 senderSession);
 	/// Tells the screen capture what to base the choice of the video encoder on, i.e. the settings and the codecs
