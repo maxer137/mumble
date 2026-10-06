@@ -617,6 +617,7 @@ void MainWindow::msgUserState(const MumbleProto::UserState &msg) {
 					Global::get().l->log(
 						Log::Information,
 						tr("%1 stopped sharing their screen.").arg(Log::formatClientUser(pDst, Log::Source)));
+					Global::get().mw->onRemoteScreenShareStopped(pDst->uiSession);
 				}
 			}
 		}
